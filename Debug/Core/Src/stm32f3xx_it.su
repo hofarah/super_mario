@@ -1,0 +1,16 @@
+stm32f3xx_it.c:87:6:NMI_Handler	4	static
+stm32f3xx_it.c:101:6:HardFault_Handler	4	static
+stm32f3xx_it.c:116:6:MemManage_Handler	4	static
+stm32f3xx_it.c:131:6:BusFault_Handler	4	static
+stm32f3xx_it.c:146:6:UsageFault_Handler	4	static
+stm32f3xx_it.c:161:6:SVC_Handler	4	static
+stm32f3xx_it.c:174:6:DebugMon_Handler	4	static
+stm32f3xx_it.c:187:6:PendSV_Handler	4	static
+stm32f3xx_it.c:200:6:SysTick_Handler	8	static
+stm32f3xx_it.c:221:6:TIM3_IRQHandler	8	static
+stm32f3xx_it.c:273:6:USART2_IRQHandler	8	static
+stm32f3xx_it.c:297:6:updateWindowMarioPosition	16	static
+stm32f3xx_it.c:334:6:updateMarioPosition	16	static
+stm32f3xx_it.c:344:6:updateMap	352	static
+stm32f3xx_it.c:372:6:showMap	352	static
+stm32f3xx_it.c:398:6:fillTestMap	24	static
