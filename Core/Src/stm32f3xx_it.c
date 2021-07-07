@@ -81,6 +81,8 @@ int marioYTmp = 0, marioXTmp = 0;
 int marioLeftRight = 0;
 int jumpLimit = 3;
 int windowDir = 1;
+uint16_t rows[]={GPIO_PIN_0,GPIO_PIN_5,GPIO_PIN_7,GPIO_PIN_15};
+
 float willChangeWindow = 0, w = 0, willChangeMario = 0;//for changing window position we need this variable
 //every .5 second decrease this variable
 /* USER CODE END EV */
@@ -221,6 +223,20 @@ void SysTick_Handler(void)
 /* For the available peripheral interrupt handler names,                      */
 /* please refer to the startup file (startup_stm32f3xx.s).                    */
 /******************************************************************************/
+
+/**
+  * @brief This function handles EXTI line4 interrupt.
+  */
+void EXTI4_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI4_IRQn 0 */
+
+  /* USER CODE END EXTI4_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+  /* USER CODE BEGIN EXTI4_IRQn 1 */
+
+  /* USER CODE END EXTI4_IRQn 1 */
+}
 
 /**
   * @brief This function handles ADC1 and ADC2 interrupts.
@@ -378,8 +394,6 @@ void USART2_IRQHandler(void)
 {
   /* USER CODE BEGIN USART2_IRQn 0 */
 
-    // 	HAL_GPIO_WritePin(GPIOE, GPIO_PIN_11, 1);
-
   /* USER CODE END USART2_IRQn 0 */
   HAL_UART_IRQHandler(&huart2);
   /* USER CODE BEGIN USART2_IRQn 1 */
@@ -415,6 +429,22 @@ void USART2_IRQHandler(void)
     HAL_UART_Receive_IT(&huart2, data, sizeof(data));
 
   /* USER CODE END USART2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles EXTI line[15:10] interrupts.
+  */
+void EXTI15_10_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI15_10_IRQn 0 */
+
+  /* USER CODE END EXTI15_10_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_10);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
+  HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_13);
+  /* USER CODE BEGIN EXTI15_10_IRQn 1 */
+
+  /* USER CODE END EXTI15_10_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */
@@ -475,7 +505,7 @@ void updateMarioPosition(int dir) {
 
     if (dir > 0) {
         if (lastLcd[marioY][marioX + 1] == 0) {
-            if (!jump) {
+            if (lastLcd[marioY+1][marioX ]!=0) {
                 marioX++;
             } else if (jumpLimit > 0) {
                 marioX++;
@@ -780,6 +810,60 @@ break;
 		HAL_GPIO_WritePin(GPIOE, GPIO_PIN_9, 0);
 break;
 	}
+}
+uint32_t lastTime=0;
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+
+
+	if (HAL_GetTick()-lastTime<150) {
+		return;
+	}
+    if (gameMode == -1) {
+        gameMode = 0;
+    }
+
+	int row=0,col=0;
+	if (GPIO_Pin == GPIO_PIN_10) {
+		 col = 0;
+	}else if (GPIO_Pin == GPIO_PIN_11) {
+		 col = 1;
+	} else if (GPIO_Pin == GPIO_PIN_13) {
+		 col = 2;
+	} else if (GPIO_Pin == GPIO_PIN_4) {
+		 col = 3;
+	}
+
+	switch(col){
+	case 0://right
+		windowDir=1;
+	    dir = 1;
+		break;
+	case 1://up
+	      if (lastLcd[marioY + 1][marioX] != 0) {
+//	        	HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
+	            jump = 1;
+	            jumpLimit = 3;
+	        }
+		break;
+	case 2://left
+		windowDir=-1;
+		dir = -1;
+		        break;
+	case 3://p
+		if (gameMode==2){
+	        gameMode = 0;
+		}else{
+			gameMode = 2;
+		}
+
+
+break;
+	}
+
+	   lastTime=HAL_GetTick();
+	   HAL_GPIO_WritePin(GPIOD, GPIO_PIN_0|GPIO_PIN_5|GPIO_PIN_7|GPIO_PIN_15,  1);
 }
 /* USER CODE END 1 */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
